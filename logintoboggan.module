@@ -294,7 +294,7 @@ function logintoboggan_form_alter(&$form, $form_state, $form_id) {
     case 'user_pass_reset':
       // We only want to run this code when the user first hits the reset login
       // form.
-      if (arg(5) != 'login' && ($uid = (int) arg(2))) {
+      if ($pre_auth && arg(5) != 'login' && ($uid = (int) arg(2))) {
         if ($account = user_load(array('uid' => $uid))) {
           $id = logintoboggan_validating_id();
           $in_pre_auth_role = in_array($id, array_keys($account->roles));
@@ -362,7 +362,7 @@ function logintoboggan_user_register_submit($form, &$form_state) {
 
   watchdog('user', 'New user: %name (%email).', array('%name' => $account->name, '%email' => $account->mail), WATCHDOG_NOTICE, l(t('edit'), 'user/'. $account->uid .'/edit'));
 
-  $login_url = variable_get('user_register', 1) == 1 ? logintoboggan_eml_validate_url($account) : NULL;
+  $login_url = ($pre_auth && variable_get('user_register', 1) == 1) ? logintoboggan_eml_validate_url($account) : null;
 
   // Compose the appropriate user message--admin approvals don't require a validation email.
   if($reg_pass_set && variable_get('user_register', 1) == 1) {
